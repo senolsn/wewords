@@ -1,0 +1,93 @@
+<dx-data-grid
+  [dataSource]="_dataSource"
+  [remoteOperations]="{ groupPaging: serverSide }"
+  [allowColumnReordering]="true"
+  [rowAlternationEnabled]="true"
+  [allowColumnResizing]="true"
+  [columnAutoWidth]="true"
+  [showBorders]="true"
+  [hoverStateEnabled]="true"
+  (visibleChange)="onToolbarPreparing($event)"
+  (onToolbarPreparing)="onToolbarPreparing($event)"
+  (onSelectionChanged)="!onSelectionChanged($event)"
+  [selectedRowKeys]="selectedRowKeys"
+  (onCellPrepared)="onCellPrepared($event)"
+  (onContentReady) ="onContentReady($event)"
+  (onRowDblClick)="onRowDblClick()" 
+>
+<!-- oncontentready ozelligi gridi tutup saga scroll edebilmeye yarıyor -->
+  <dxo-state-storing [enabled]="stateStoring" type="localStorage" [storageKey]="stateStoringKey">
+  </dxo-state-storing>
+  <dxo-selection mode="single"></dxo-selection>
+  <dxo-column-chooser [enabled]="columnButton && !simple"></dxo-column-chooser>
+  <dxo-paging [pageSize]="pageSize"></dxo-paging>
+  <dxo-pager
+    [showPageSizeSelector]="true"
+    [allowedPageSizes]="[10, 25, 50, 100]"
+    [showInfo]="true"
+    [showNavigationButtons]="true"
+    [visible] = "true"
+  ></dxo-pager>
+  <dxo-export [enabled]="export"></dxo-export>
+
+  <dxo-load-panel [enabled]="loadPanel" [indicatorSrc]="indicatorUrl"> </dxo-load-panel>
+
+  <dxo-search-panel
+    [visible]="searchPanel"
+    [highlightCaseSensitive]="true"
+    [width]="250"
+  ></dxo-search-panel>
+  <dxo-group-panel [visible]="grouping && !simple"></dxo-group-panel>
+  <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+  <!-- <dxo-column-fixing [enabled]="true"></dxo-column-fixing> -->
+  <dxo-filter-panel [visible]="false"></dxo-filter-panel>
+  <dxo-filter-row
+    [visible]="filtering && !simple"
+    applyFilter="auto"
+  ></dxo-filter-row>
+  <dxo-header-filter [visible]="filtering && !simple"></dxo-header-filter>
+
+  <dxi-column
+    *ngFor="let column of columns"
+    [dataField]="column.field"
+    [dataType]="column.type"
+    [type]="column.type === 'buttons' && 'buttons'"
+    [caption]="column.caption | translate"
+    [visible]="column.visible"
+    [format]="column.format"
+    [headerFilter]="true"
+    [fixed]="column.fixed"
+    [groupIndex] = "column.groupIndex == '' ? null : column.groupIndex"
+  >
+    <dxi-button
+      *ngIf="column.type == 'buttons'"
+      [hint]="column.hint | translate"
+      [icon]="column.icon"
+      [visible]="column.visible"
+      [cssClass]="column.cssClass"
+      [text]="column.buttonText"
+      [onClick]="column.buttonCallBack"
+    >
+    </dxi-button>
+  </dxi-column>
+
+  <dxo-summary *ngIf="summaryColumns.length > 0">
+    <dxi-total-item
+      *ngFor="let column of summaryColumns"
+      [column]="column.field"
+      [summaryType]="column.summaryType"
+      [valueFormat]="column.format"
+    >
+    </dxi-total-item>
+  </dxo-summary>
+  <dxo-summary *ngIf="groupSummaryColumns.length > 0">
+    <dxi-group-item
+      *ngFor="let column of groupSummaryColumns"
+      [column]="column.field"
+      [summaryType]="column.summaryType"
+      [valueFormat]="column.format"
+      [showInGroupFooter]="column.showInGroupFooter"
+    >
+    </dxi-group-item>
+  </dxo-summary>
+</dx-data-grid>
