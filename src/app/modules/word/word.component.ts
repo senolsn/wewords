@@ -26,6 +26,7 @@ export class WordComponent implements OnInit {
   public hasAttempted: boolean = false; // Kullanıcının kontrol yapıp yapmadığını takip eder
   public selectedGroup: any = null; // Seçili radio button'u tutar
   public excelGrupAdi: string = ""; // Excel'den yüklenen kelime grubunun adı
+  public isEnglishOrTurkish: boolean = false; // İngilizce mi Türkçe mi, default EN
 
 
   constructor(
@@ -60,11 +61,23 @@ export class WordComponent implements OnInit {
   })
  }
 
- onRadioButtonChanged(grup:any){
-  this.cevirilecekKelimeler = grup.kelimeler;
-  this.kelimelerinCevirileri = grup.ceviriler;
+ onRadioButtonChanged(grup: any) {
+  debugger;
+  
+  // Derin kopya oluşturuyoruz.
+  const groupCopy = JSON.parse(JSON.stringify(grup));
+
+  if (this.isEnglishOrTurkish) {
+    this.kelimelerinCevirileri = [...groupCopy.kelimeler];
+    this.cevirilecekKelimeler = [...groupCopy.ceviriler];
+  } else {
+    this.cevirilecekKelimeler = [...groupCopy.kelimeler];
+    this.kelimelerinCevirileri = [...groupCopy.ceviriler];
+  }
+
   this.getRandomWord();
- }
+}
+
  //Oyun başladığında rastgele kelime seçilecek metot.
  getRandomWord(){
   const randomIndex = Math.floor(Math.random() * this.cevirilecekKelimeler.length);
@@ -108,7 +121,7 @@ async removeWordFromList() {
   }
 }
 
-
+//Excel dosyasını okuyup kelimeleri gruplara atayan metot.
 onFileChange(event: any): void {
   const target: DataTransfer = <DataTransfer>(event.target);
 
@@ -169,5 +182,26 @@ saveToLocalStorage(): void {
 
   this.kelimeGruplari.push(newGroup);
   this.notificationService.success("Kelime grubu başarıyla kaydedildi.");
+}
+
+public downloadExcelTemplate(){
+  const link = document.createElement('a');
+  link.href = '../../../../assets/excels/KelimeSablonu.xlsx';
+  link.download = 'OrnekSablon.xlsx';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+toggleTranslation(e:any){
+this.isEnglishOrTurkish = e.target.checked;
+
+let templateArray = this.kelimelerinCevirileri;
+this.kelimelerinCevirileri = this.cevirilecekKelimeler;
+this.cevirilecekKelimeler = templateArray;
+
+let templateWord = this.currentWord;
+this.currentWord = this.currentTranslation;
+this.currentTranslation = templateWord;
 }
 }

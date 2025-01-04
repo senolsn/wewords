@@ -29,6 +29,25 @@
           <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0  d-grid">
             <button (click)="checkTranslation()" class="btn btn-warning btn-border my-3">Çevir</button>
           </div>
+
+          <div class="row">
+            <div class="col-12 mb-3 d-flex justify-content-center">
+              <div> Çeviri Türü: {{ isEnglishOrTurkish ? 'Türkçe -> İngilizce' : 'İngilizce -> Türkçe' }} </div>
+            </div>
+              <div class="col-4 d-flex justify-content-end">
+                <img src="../../../assets/images/flags/us.svg" class="rounded mx-2" width="20" height="20">
+              </div>
+              <div class="col-4">
+                <div class="form-check form-switch form-switch-custom  d-flex justify-content-center">
+                  <input [checked]="isEnglishOrTurkish" (change)="toggleTranslation($event)" class="form-check-input w-75" type="checkbox" role="switch">
+                </div>
+              </div>
+              <div class="col-4 d-flex justify-content-start">
+                <img src="../../../assets/images/flags/tr.svg" class="rounded mx-2" width="20" height="20">
+              </div>
+          </div>
+
+            
         </div>
       </div>
       
@@ -46,7 +65,8 @@
               <label class="form-label text-white">Excel Dosyası Yükle</label>
               <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
             </div>
-            <button (click)="saveToLocalStorage()" class="btn btn-success mt-3 w-100">Kelime Grubunu Kaydet</button>
+            <button (click)="saveToLocalStorage()" class="btn btn-primary mt-3 me-1">Kelime Grubunu Kaydet</button>
+            <button type="button" (click)="downloadExcelTemplate()" class="btn btn-success btn-label waves-effect waves-light mt-3"><i class=" ri-file-excel-line label-icon align-middle fs-16 me-2"></i> Örnek Şablon İndir</button>
           </div>
         </div>
       </div>
