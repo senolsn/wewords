@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { levelA1WordsEN, levelA1WordsTR, top10WordsEN, top10WordsTR } from "../../../app/core/data/word";
+import { defaultWordsTR, defaultWordsEN } from "../../../app/core/data/word";
 import { Word } from "src/app/core/models/word";
 import { DialogService } from "src/app/core/services/dialog.service";
 import { NotificationService } from "src/app/core/services/notification.service";
@@ -43,10 +43,8 @@ export class WordComponent implements OnInit {
 
  setDefaultWords(){
    //Siteye ilk giriş koşulu
-   const defaultWordsGroup1 = { dil: localStorage.getItem('lang'), grupAdi: "En Önemli 10 Kelime", kelimeler: top10WordsEN, ceviriler: top10WordsTR};
-   const defaultWordsGroup2 = { dil: localStorage.getItem('lang'), grupAdi: "A1 Kelime Grubu", kelimeler: levelA1WordsEN, ceviriler: levelA1WordsTR};
+   const defaultWordsGroup1 = { dil: localStorage.getItem('lang'), grupAdi: "En Çok Kullanılan 10 Kelime", kelimeler: defaultWordsEN, ceviriler: defaultWordsTR};
    localStorage.setItem("defaultWords", JSON.stringify(defaultWordsGroup1));
-   localStorage.setItem("defaultWords2", JSON.stringify(defaultWordsGroup2));
  }
 
  getUserWordGroups(){
