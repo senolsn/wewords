@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { levelA1WordsEN, levelA1WordsTR, top10WordsEN, top10WordsTR } from "../../../app/core/data/word";
 import { Word } from "src/app/core/models/word";
 import { DialogService } from "src/app/core/services/dialog.service";
+import { NotificationService } from "src/app/core/services/notification.service";
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: "app-word",
@@ -12,6 +14,9 @@ export class WordComponent implements OnInit {
   
   public kelimeGruplari : Array<Word> = [];
 
+  public importedWords: Array<{ EN: string; TR: string }> = [];
+
+
   public cevirilecekKelimeler : Array<string> = [];
   public kelimelerinCevirileri : Array<string> = [];
   public currentInput: string = ""; // Kullanıcıdan alınan çeviri
@@ -20,10 +25,12 @@ export class WordComponent implements OnInit {
   public currentWord: string = ""; // Şu anki kelime
   public hasAttempted: boolean = false; // Kullanıcının kontrol yapıp yapmadığını takip eder
   public selectedGroup: any = null; // Seçili radio button'u tutar
+  public excelGrupAdi: string = ""; // Excel'den yüklenen kelime grubunun adı
 
 
   constructor(
-    private dialogService : DialogService
+    private dialogService : DialogService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +84,7 @@ export class WordComponent implements OnInit {
     return;
   }
   this.currentInput = "";
-}
+} 
 //Doğru çevrilen kelimenin listelerden çıkarılmasını sağlayan metot.
 async removeWordFromList() {
   const index = this.cevirilecekKelimeler.indexOf(this.currentWord);
@@ -99,5 +106,68 @@ async removeWordFromList() {
     this.kelimelerinCevirileri = [];
     this.currentWord = "";
   }
+}
+
+
+onFileChange(event: any): void {
+  const target: DataTransfer = <DataTransfer>(event.target);
+
+  if (target.files.length !== 1) {
+    this.notificationService.error("Lütfen tek bir dosya seçin.");
+    return;
+  }
+
+  const file: File = target.files[0];
+  const reader: FileReader = new FileReader();
+
+  reader.onload = (e: any) => {
+    const bstr: string = e.target.result;
+    const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+
+    // İlk sayfayı seçiyoruz
+    const wsname: string = wb.SheetNames[0];
+    const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+
+    // Excel verisini JSON formatına çeviriyoruz
+    let data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    data = data.slice(1);
+    
+    console.log(data);
+    // Kolonları işleme
+    this.importedWords = [];
+    data.forEach((row: any) => {
+      if (row[0] && row[1]) {
+        this.importedWords.push({ EN: row[0], TR: row[1] });
+      }
+    });
+
+    if (this.importedWords.length === 0) {
+      this.notificationService.error("Geçerli bir kelime grubu bulunamadı.");
+    } else {
+      this.notificationService.success("Excel dosyası başarıyla okundu.");
+    }
+  };
+
+  reader.readAsBinaryString(file);
+}
+
+saveToLocalStorage(): void {
+  if (this.importedWords.length === 0) {
+    this.notificationService.error("Lütfen önce bir Excel dosyası yükleyin.");
+    return;
+  }
+
+  const newGroup = {
+    dil: "EN-TR",
+    grupAdi: this.excelGrupAdi == "" ? "Excel Kelime Grubu" : this.excelGrupAdi,
+    kelimeler: this.importedWords.map((word) => word.EN),
+    ceviriler: this.importedWords.map((word) => word.TR),
+  };
+
+  const groupKey = `wordGroup_${new Date().getTime()}`;
+  localStorage.setItem(groupKey, JSON.stringify(newGroup));
+
+  this.kelimeGruplari.push(newGroup);
+  this.notificationService.success("Kelime grubu başarıyla kaydedildi.");
 }
 }

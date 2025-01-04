@@ -32,9 +32,25 @@
         </div>
       </div>
       
-      <div class="col-4">
-
+      <div class="col-4 px-3 d-flex flex-column align-items-end my-4">
+        <div class="card">
+          <div class="card-header align-items-center d-flex">
+            <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Yükleme</h4>
+          </div>
+          <div class="card-body">
+            <div class="form-group mb-2">
+              <label class="form-label text-white">Grup Adı</label>
+              <input type="text" [(ngModel)]="excelGrupAdi" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label text-white">Excel Dosyası Yükle</label>
+              <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
+            </div>
+            <button (click)="saveToLocalStorage()" class="btn btn-success mt-3 w-100">Kelime Grubunu Kaydet</button>
+          </div>
+        </div>
       </div>
+      
     </div>
     
     <div class="row mb-1">
