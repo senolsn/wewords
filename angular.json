@@ -26,6 +26,7 @@
             "outputPath": "dist/velzon",
             "index": "src/index.html",
             "main": "src/main.ts",
+            "baseHref": "/wewords-deploy/",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
