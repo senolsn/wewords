@@ -26,8 +26,9 @@
             'border-danger': !isCorrect && hasAttempted
           }"
           />
-          <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0  d-grid">
+          <div class="d-grid">
             <button (click)="checkTranslation()" class="btn btn-warning btn-border my-3">Çevir</button>
+            <button (click)="passWord()" class="btn btn-danger btn-border mb-3">Atla</button>
           </div>
 
           <div class="row">

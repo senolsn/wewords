@@ -83,6 +83,19 @@ export class WordComponent implements OnInit {
   this.currentTranslation = this.kelimelerinCevirileri[randomIndex];
   return this.currentWord;
  }
+
+ //Kelimeyi atlamak için çağırılacak metot.
+ passWord(){
+  const previousWord = this.currentWord; // Önceki kelimeyi sakla
+  let newWord = this.getRandomWord(); // Yeni kelime seç
+
+  while (newWord === previousWord){ // Eğer yeni kelime önceki kelimeyle aynıysa tekrar seçim yap.
+    newWord = this.getRandomWord();
+  }
+  //Farklı olduğunda yeni kelimeyi döndür.
+  this.currentWord = newWord;
+}
+
  //Çevirinin doğru olup olmadığını kontrol eden metot.
  checkTranslation() {
   this.hasAttempted = true; // Kullanıcı kontrol yaptı
@@ -116,6 +129,7 @@ async removeWordFromList() {
     this.cevirilecekKelimeler = [];
     this.kelimelerinCevirileri = [];
     this.currentWord = "";
+    this.currentTranslation = "";
   }
 }
 
@@ -184,8 +198,8 @@ saveToLocalStorage(): void {
 
 public downloadExcelTemplate(){
   const link = document.createElement('a');
-  link.href = '../../../../assets/excels/KelimeSablonu.xlsx';
-  link.download = 'OrnekSablon.xlsx';
+  link.href = './assets/excels/KelimeSablonu.xlsx';
+  link.download = 'KelimeSablonu.xlsx';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
