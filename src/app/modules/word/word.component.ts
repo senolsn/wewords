@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import { defaultWordsTR, defaultWordsEN } from "../../../app/core/data/word";
 import { Word } from "src/app/core/models/word";
 import { DialogService } from "src/app/core/services/dialog.service";
 import { NotificationService } from "src/app/core/services/notification.service";
@@ -18,34 +17,29 @@ interface MissedWord {
   styleUrl: "./word.component.scss",
 })
 export class WordComponent implements OnInit {
-  
-  public kelimeGruplari : Array<Word> = [];
-
+  public kelimeGruplari: Array<Word> = [];
   public importedWords: Array<{ EN: string; TR: string }> = [];
-
-
-  public cevirilecekKelimeler : Array<string> = [];
-  public kelimelerinCevirileri : Array<string> = [];
-  public currentInput: string = ""; // Kullanıcıdan alınan çeviri
-  public isCorrect: boolean = false; // Çeviri doğru mu
-  public currentTranslation: string = ""; // Şu anki kelimenin çevirisi
-  public currentWord: string = ""; // Şu anki kelime
-  public hasAttempted: boolean = false; // Kullanıcının kontrol yapıp yapmadığını takip eder
-  public selectedGroup: any = null; // Seçili radio button'u tutar
-  public excelGrupAdi: string = ""; // Excel'den yüklenen kelime grubunun adı
-  public isEnglishOrTurkish: boolean = false; // İngilizce mi Türkçe mi, default EN
+  public cevirilecekKelimeler: Array<string> = [];
+  public kelimelerinCevirileri: Array<string> = [];
+  public currentInput: string = "";
+  public isCorrect: boolean = false;
+  public currentTranslation: string = "";
+  public currentWord: string = "";
+  public hasAttempted: boolean = false;
+  public selectedGroup: any = null;
+  public excelGrupAdi: string = "";
+  public isEnglishOrTurkish: boolean = false;
   missedWords: MissedWord[] = [];
 
-
   constructor(
-    private dialogService : DialogService,
+    private dialogService: DialogService,
     private notificationService: NotificationService
   ) {
     this.loadMissedWords();
   }
 
   ngOnInit(): void {
-    if(localStorage.length <= 1) this.setDefaultWords(); // Sadece 'lang' varsa veya hiç item yoksa
+    if(localStorage.length <= 1) this.setDefaultWords();
     this.getUserWordGroups();
   }
 
