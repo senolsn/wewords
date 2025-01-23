@@ -1,90 +1,176 @@
-<div class="d-flex align-items-center justify-content-center bg-dark" style="height: 100vh; margin: 0; background-color: #1A1D21 !important">
+<div class="bg-dark" style="min-height: 100vh; background-color: #1A1D21 !important">
   <div class="container-fluid">
-    <div class="row" style="height: 96vh">
-      <div class="col-4 px-3 d-flex flex-column align-items-start my-4">
-        <div class="card">
+    <div class="row" style="min-height: 96vh">
+      <!-- Sol Panel - Kelime Grupları -->
+      <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-start mt-4" style="align-items: flex-start;">
+        <div class="card w-75 w-md-75 mx-3 mx-md-3">
           <div class="card-header align-items-center d-flex">
             <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Grupları</h4>
           </div>
-          <div class="card-body">
-            <div class="list-group">
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush">
               <label *ngFor="let grup of kelimeGruplari" class="list-group-item">
-                    <input type="radio"  [(ngModel)]="selectedGroup" [value]="grup" (change)="onRadioButtonChanged(grup)" class="form-check-input me-1" name="radioButton"/> 
-                    {{grup.grupAdi}}
+                <input type="radio" [(ngModel)]="selectedGroup" [value]="grup" (change)="onRadioButtonChanged(grup)" class="form-check-input me-1" name="radioButton"/> 
+                {{grup.grupAdi}}
               </label>
             </div>
           </div>
         </div>
       </div>
       
-      <div class="col-4 d-flex flex-column align-items-center justify-content-center">
-        <div class="border border-1 border-light p-2 w-75 h-20">
-          <label for="exampleInput" class="form-label text-white"><h5>Çevirilecek Kelime : {{currentWord}} </h5></label>
-          <input type="text" id="exampleInput" [(ngModel)]="currentInput" class="form-control text-white h-30" autocomplete="off" (keyup.enter)="checkTranslation()"   
-          [ngClass]="{
-            'border-primary': isCorrect && hasAttempted,
-            'border-danger': !isCorrect && hasAttempted
-          }"
-          />
-          <div class="d-grid">
-            <button (click)="checkTranslation()" class="btn btn-warning btn-border my-3">Çevir</button>
-            <button (click)="passWord()" class="btn btn-danger btn-border mb-3">Atla</button>
+      <!-- Orta Panel - Çeviri Alanı -->
+      <div class="col-12 col-md-4 d-flex flex-column align-items-center justify-content-center my-3 my-md-0">
+        @if(!selectedGroup){
+          <!-- Web görünümü için uyarı -->
+          <div class="card w-100 w-md-100 mx-3 mx-md-0 d-none d-md-block">
+            <div class="card-body text-center">
+              <div class="mb-4">
+                <i class="ri-arrow-left-circle-line text-warning display-5 mb-3"></i>
+                <h4 class="text-warning">Lütfen başlamak için sol taraftan bir kelime grubu seçiniz</h4>
+              </div>
+              <div>
+                <i class="ri-arrow-right-circle-line text-info display-5 mb-3"></i>
+                <h4 class="text-info">Veya sağ taraftan kendi kelime şablonunuzu yükleyebilirsiniz</h4>
+              </div>
+            </div>
           </div>
 
-          <div class="row">
-            <div class="col-12 mb-3 d-flex justify-content-center">
-              <div> Çeviri Türü: {{ isEnglishOrTurkish ? 'Türkçe -> İngilizce' : 'İngilizce -> Türkçe' }} </div>
-            </div>
-              <div class="col-4 d-flex justify-content-end">
-                <img src="assets/images/flags/us.svg" class="rounded mx-2" width="20" height="20">
+          <!-- Mobil görünüm için uyarı -->
+          <div class="card w-100 w-md-100 mx-3 mx-md-0 d-md-none">
+            <div class="card-body text-center">
+              <div class="mb-4">
+                <i class="ri-arrow-up-circle-line text-warning display-5 mb-3"></i>
+                <h4 class="text-warning">Başlamak için yukarıdan bir kelime grubu seçiniz</h4>
               </div>
-              <div class="col-4">
-                <div class="form-check form-switch form-switch-custom  d-flex justify-content-center">
-                  <input [checked]="isEnglishOrTurkish" (change)="toggleTranslation($event)" class="form-check-input w-75" type="checkbox" role="switch">
+              <div>
+                <i class="ri-arrow-down-circle-line text-info display-5 mb-3"></i>
+                <h4 class="text-info">Veya sağ taraftan kendi kelime şablonunuzu yükleyebilirsiniz</h4>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <!-- Kelime grubu seçildiğinde gösterilecek içerik -->
+          <div class="card w-100 w-md-75 mx-3 mx-md-0 mb-3">
+            <div class="card-header align-items-center d-flex">
+              <h4 class="card-title mb-0 flex-grow-1 text-center">Çevrilecek Kelime</h4>
+            </div>
+            <div class="card-body">
+              <h3 class="text-primary text-center mb-0">{{currentWord}}</h3>
+            </div>
+          </div>
+
+          <div class="card w-100 w-md-75 mx-3 mx-md-0">
+            <div class="card-body">
+              <input type="text" id="exampleInput" [(ngModel)]="currentInput" 
+                     class="form-control form-control-lg text-white mb-3" 
+                     placeholder="Çevirinizi yazın..."
+                     autocomplete="off" 
+                     (keyup.enter)="checkTranslation()"   
+                     [ngClass]="{
+                       'border-primary': isCorrect && hasAttempted,
+                       'border-danger': !isCorrect && hasAttempted
+                     }"/>
+              
+              <div class="d-grid gap-2">
+                <button (click)="checkTranslation()" class="btn btn-warning btn-border">Çevir</button>
+                <button (click)="passWord()" class="btn btn-danger btn-border">Atla</button>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-12 mb-3 d-flex justify-content-center">
+                  <div class="text-center"> Çeviri Türü: {{ isEnglishOrTurkish ? 'Türkçe -> İngilizce' : 'İngilizce -> Türkçe' }} </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="d-flex align-items-center">
+                    <img src="assets/images/flags/us.svg" class="rounded mx-2" width="20" height="20">
+                    <div class="form-check form-switch form-switch-custom mx-2">
+                      <input [checked]="isEnglishOrTurkish" (change)="toggleTranslation($event)" class="form-check-input" type="checkbox" role="switch">
+                    </div>
+                    <img src="assets/images/flags/tr.svg" class="rounded mx-2" width="20" height="20">
+                  </div>
                 </div>
               </div>
-              <div class="col-4 d-flex justify-content-start">
-                <img src="assets/images/flags/tr.svg" class="rounded mx-2" width="20" height="20">
+            </div>
+          </div>
+        }
+      </div>
+      
+      <!-- Sağ Panel -->
+      <div class="col-12 col-md-4 d-flex flex-column align-items-center align-items-md-end mt-4">
+        <!-- Mobilde Bilinemeyen Kelimeler -->
+        <div class="w-75 d-md-none px-3">
+          <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">Bilinemeyen Kelimeler</h5>
+              <button (click)="clearMissedWords()" class="btn btn-sm btn-light">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                <li *ngFor="let word of missedWords" class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>{{word.original}}</span>
+                  <span class="badge bg-primary text-white">{{word.translation}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kelime Yükleme -->
+        <div class="w-75 w-md-75 px-3 me-md-3">
+          <div class="card">
+            <div class="card-header align-items-center d-flex">
+              <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Yükleme</h4>
+            </div>
+            <div class="card-body">
+              <div class="form-group mb-2">
+                <label class="form-label text-white">Grup Adı</label>
+                <input type="text" [(ngModel)]="excelGrupAdi" class="form-control" />
               </div>
+              <div class="form-group">
+                <label class="form-label text-white">Excel Dosyası Yükle</label>
+                <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
+              </div>
+              <div class="d-grid gap-2 mt-3">
+                <button (click)="saveToLocalStorage()" class="btn btn-primary">Kelime Grubunu Kaydet</button>
+                <button type="button" (click)="downloadExcelTemplate()" class="btn btn-success btn-label waves-effect waves-light">
+                  <i class="ri-file-excel-line label-icon align-middle fs-16 me-2"></i> Örnek Şablon İndir
+                </button>
+              </div>
+            </div>
           </div>
 
-            
-        </div>
-      </div>
-      
-      <div class="col-4 px-3 d-flex flex-column align-items-end my-4">
-        <div class="card">
-          <div class="card-header align-items-center d-flex">
-            <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Yükleme</h4>
-          </div>
-          <div class="card-body">
-            <div class="form-group mb-2">
-              <label class="form-label text-white">Grup Adı</label>
-              <input type="text" [(ngModel)]="excelGrupAdi" class="form-control" />
+          <!-- Masaüstünde Bilinemeyen Kelimeler -->
+          <div class="d-none d-md-block">
+            <div class="card mt-3">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Bilinemeyen Kelimeler</h5>
+                <button (click)="clearMissedWords()" class="btn btn-sm btn-light">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li *ngFor="let word of missedWords" class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{word.original}}</span>
+                    <span class="badge bg-primary text-white">{{word.translation}}</span>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label text-white">Excel Dosyası Yükle</label>
-              <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
-            </div>
-            <button (click)="saveToLocalStorage()" class="btn btn-primary mt-3 me-1">Kelime Grubunu Kaydet</button>
-            <button type="button" (click)="downloadExcelTemplate()" class="btn btn-success btn-label waves-effect waves-light mt-3"><i class=" ri-file-excel-line label-icon align-middle fs-16 me-2"></i> Örnek Şablon İndir</button>
           </div>
         </div>
       </div>
-      
     </div>
     
-    <div class="row mb-1">
-      <div class="col-12">
-          <div class="container-fluid">
-              <div class="row ">
-                  <div class="col-sm-12 text-center">
-                     <h6>© Designed and developed by codeweh</h6>
-                  </div>
-              </div>
-          </div>
+    <!-- Footer -->
+    <div class="row">
+      <div class="col-12 text-center mb-3">
+        <h6 class="mb-0">© Designed and developed by codeweh</h6>
       </div>
     </div>
   </div>
 </div>
+
 

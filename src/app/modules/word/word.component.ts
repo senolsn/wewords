@@ -5,6 +5,12 @@ import { DialogService } from "src/app/core/services/dialog.service";
 import { NotificationService } from "src/app/core/services/notification.service";
 import * as XLSX from 'xlsx';
 
+interface MissedWord {
+  original: string;
+  translation: string;
+  timestamp: number;
+}
+
 @Component({
   selector: "app-word",
   templateUrl: "./word.component.html",
@@ -27,12 +33,15 @@ export class WordComponent implements OnInit {
   public selectedGroup: any = null; // Seçili radio button'u tutar
   public excelGrupAdi: string = ""; // Excel'den yüklenen kelime grubunun adı
   public isEnglishOrTurkish: boolean = false; // İngilizce mi Türkçe mi, default EN
+  missedWords: MissedWord[] = [];
 
 
   constructor(
     private dialogService : DialogService,
     private notificationService: NotificationService
-  ) {}
+  ) {
+    this.loadMissedWords();
+  }
 
   ngOnInit(): void {
     
@@ -50,10 +59,10 @@ export class WordComponent implements OnInit {
  getUserWordGroups(){
   const keys = Object.keys(localStorage);
   keys.forEach(key => {
-    if(key == "lang"){
-      
-    }
-    else{
+    // defaultWords ve wordGroup_ ile başlayan grupları göster
+    if (key !== 'lang' && 
+        key !== 'missedWords' && 
+        (key.startsWith('wordGroup_') || key === 'defaultWords')) {
       this.kelimeGruplari.push(JSON.parse(localStorage.getItem(key)));
     }
   })
@@ -94,18 +103,24 @@ export class WordComponent implements OnInit {
   }
   //Farklı olduğunda yeni kelimeyi döndür.
   this.currentWord = newWord;
-}
+  this.saveMissedWord(
+    this.currentWord,
+    this.currentTranslation
+  );
+ }
 
  //Çevirinin doğru olup olmadığını kontrol eden metot.
  checkTranslation() {
-  this.hasAttempted = true; // Kullanıcı kontrol yaptı
+  this.hasAttempted = true;
   if (this.currentInput.toLowerCase().trim() === this.currentTranslation.toLowerCase().trim()) {
     this.isCorrect = true;
     this.removeWordFromList();
-
   } else {
     this.isCorrect = false;
-    return;
+    this.saveMissedWord(
+      this.currentWord,
+      this.currentTranslation
+    );
   }
   this.currentInput = "";
 } 
@@ -215,5 +230,37 @@ this.cevirilecekKelimeler = templateArray;
 let templateWord = this.currentWord;
 this.currentWord = this.currentTranslation;
 this.currentTranslation = templateWord;
+}
+
+// Bilinemeyen kelimeleri localStorage'dan yükleme
+loadMissedWords() {
+  const savedWords = localStorage.getItem('missedWords');
+  if (savedWords) {
+    this.missedWords = JSON.parse(savedWords);
+  }
+}
+
+// Bilinemeyen kelimeleri kaydetme
+saveMissedWord(original: string, translation: string) {
+  if (this.missedWords.some(word => 
+      word.original === original && 
+      word.translation === translation)) {
+    return;
+  }
+
+  const missedWord: MissedWord = {
+    original,
+    translation,
+    timestamp: new Date().getTime()
+  };
+  
+  this.missedWords.push(missedWord);
+  localStorage.setItem('missedWords', JSON.stringify(this.missedWords));
+}
+
+// Bilinemeyen kelimeleri temizleme
+clearMissedWords() {
+  this.missedWords = [];
+  localStorage.removeItem('missedWords');
 }
 }
