@@ -9,9 +9,16 @@
           </div>
           <div class="card-body p-0">
             <div class="list-group list-group-flush">
-              <label *ngFor="let grup of kelimeGruplari" class="list-group-item">
-                <input type="radio" [(ngModel)]="selectedGroup" [value]="grup" (change)="onRadioButtonChanged(grup)" class="form-check-input me-1" name="radioButton"/> 
-                {{grup.grupAdi}}
+              <label *ngFor="let grup of kelimeGruplari" class="list-group-item d-flex align-items-center">
+                <input type="radio" [(ngModel)]="selectedGroup" [value]="grup" 
+                       (change)="onRadioButtonChanged(grup)" 
+                       class="form-check-input me-1" name="radioButton"/> 
+                <span class="flex-grow-1">{{grup.grupAdi}}</span>
+                <button class="btn btn-sm btn-link text-danger" 
+                        (click)="$event.preventDefault(); deleteWordGroup(grup.key)"
+                        *ngIf="grup.key !== 'defaultWords'">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
               </label>
             </div>
           </div>

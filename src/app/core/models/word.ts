@@ -3,4 +3,5 @@ export class Word{
     grupAdi:string;
     kelimeler:string[];
     ceviriler:string[];
+    key?: string;
 }
