@@ -71,14 +71,34 @@ export class WordComponent implements OnInit {
 
   getUserWordGroups() {
     const keys = Object.keys(localStorage);
+    const levelOrder = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    
+    // Önce tüm grupları toplayalım
+    const allGroups: any[] = [];
+    
     keys.forEach(key => {
       if (key !== 'lang' && 
           key !== 'missedWords' && 
-          key.startsWith('wordGroup_')) { // defaultWords kontrolünü kaldırdık
+          key.startsWith('wordGroup_')) {
         const group = JSON.parse(localStorage.getItem(key));
         group.key = key;
-        this.kelimeGruplari.push(group);
+        allGroups.push(group);
       }
+    });
+
+    // Grupları sıralayalım
+    this.kelimeGruplari = allGroups.sort((a, b) => {
+      // Default gruplar için seviye sıralaması
+      if (a.grupAdi.includes('Seviye') && b.grupAdi.includes('Seviye')) {
+        const levelA = a.grupAdi.split(' ')[0]; // "A1", "B2" gibi
+        const levelB = b.grupAdi.split(' ')[0];
+        return levelOrder.indexOf(levelA) - levelOrder.indexOf(levelB);
+      }
+      // Default olmayan gruplar en sona
+      if (a.grupAdi.includes('Seviye')) return -1;
+      if (b.grupAdi.includes('Seviye')) return 1;
+      // Default olmayan gruplar kendi aralarında alfabetik sıralı
+      return a.grupAdi.localeCompare(b.grupAdi);
     });
   }
 
