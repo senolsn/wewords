@@ -94,28 +94,42 @@ export class WordComponent implements OnInit {
     this.getRandomWord();
   }
 
-  //Oyun başladığında rastgele kelime seçilecek metot.
-  getRandomWord(){
-    const randomIndex = Math.floor(Math.random() * this.cevirilecekKelimeler.length);
-    this.currentWord = this.cevirilecekKelimeler[randomIndex];
-    this.currentTranslation = this.kelimelerinCevirileri[randomIndex];
+  // Rastgele kelime seçen metot sadece index döndürsün
+  getRandomWordIndex(): number {
+    return Math.floor(Math.random() * this.cevirilecekKelimeler.length);
+  }
+
+  // Seçilen indexteki kelimeyi set eden metot
+  setCurrentWord(index: number) {
+    this.currentWord = this.cevirilecekKelimeler[index];
+    this.currentTranslation = this.kelimelerinCevirileri[index];
+  }
+
+  // Oyun başladığında rastgele kelime seçilecek metot
+  getRandomWord() {
+    const randomIndex = this.getRandomWordIndex();
+    this.setCurrentWord(randomIndex);
     return this.currentWord;
   }
 
-  //Kelimeyi atlamak için çağırılacak metot.
-  passWord(){
-    const previousWord = this.currentWord; // Önceki kelimeyi sakla
-    let newWord = this.getRandomWord(); // Yeni kelime seç
-
-    while (newWord === previousWord){ // Eğer yeni kelime önceki kelimeyle aynıysa tekrar seçim yap.
-      newWord = this.getRandomWord();
-    }
-    //Farklı olduğunda yeni kelimeyi döndür.
-    this.currentWord = newWord;
+  // Kelimeyi atlamak için çağırılacak metot
+  passWord() {
+    // Önce mevcut kelimeyi bilinmeyen kelimelere ekle
     this.saveMissedWord(
       this.currentWord,
       this.currentTranslation
     );
+
+    const previousWord = this.currentWord;
+    let randomIndex = this.getRandomWordIndex();
+
+    // Eğer yeni kelime önceki kelimeyle aynıysa tekrar seçim yap
+    while (this.cevirilecekKelimeler[randomIndex] === previousWord && 
+           this.cevirilecekKelimeler.length > 1) {
+      randomIndex = this.getRandomWordIndex();
+    }
+
+    this.setCurrentWord(randomIndex);
   }
 
   //Çevirinin doğru olup olmadığını kontrol eden metot.
