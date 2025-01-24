@@ -18,6 +18,8 @@ html, body {
   --bg-main: #1C1C1C;
   --bg-input: #2F2F2F;
   --bg-hover: #424242;
+  --button-bg: #424242;
+  --button-hover: #2F2F2F;
   min-height: 100vh;
   background-color: #1C1C1C;
   margin: 0;
@@ -36,6 +38,8 @@ html, body {
     --bg-main: #F5F5F5;
     --bg-input: #FFFFFF;
     --bg-hover: #EEEEEE;
+    --button-bg: #f8fafc;
+    --button-hover: #e2e8f0;
   }
 }
 
@@ -421,8 +425,8 @@ html, body {
 .add-words-btn {
   position: fixed;
   bottom: calc(2.5rem + 1rem);
-  right: 6.5rem; // tema butonunun yanında
-  background: var(--primary);
+  right: 6.5rem;
+  background: var(--button-bg);
   border: none;
   color: var(--text);
   width: 3.5rem;
@@ -442,6 +446,7 @@ html, body {
   }
   
   &:hover {
+    background: var(--button-hover);
     transform: scale(1.1);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   }
@@ -610,5 +615,41 @@ html, body {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+  }
+}
+
+// İndirme butonu stili
+.btn-download {
+  background: none;
+  border: none;
+  color: var(--primary);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  i {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Card header'daki buton grubu için düzenleme
+.card-header {
+  .d-flex.gap-2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 }

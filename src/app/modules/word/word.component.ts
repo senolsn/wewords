@@ -281,6 +281,14 @@ export class WordComponent implements OnInit {
       return;
     }
 
+    const typeWords = this.missedWords.filter(word => word.type === type);
+    if (typeWords.length >= 5) {
+      this.notificationService.info(
+        'Maksimum kelime sayısına ulaşıldı. Lütfen mevcut kelimeleri indirin veya temizleyin.'
+      );
+      return;
+    }
+
     const missedWord: MissedWord = {
       original,
       translation,
@@ -289,13 +297,7 @@ export class WordComponent implements OnInit {
     };
     
     this.missedWords.push(missedWord);
-    localStorage.setItem('missedWords', JSON.stringify(this.missedWords));
-  }
-
-  // Bilinemeyen kelimeleri temizleme
-  clearMissedWords() {
-    this.missedWords = [];
-    localStorage.removeItem('missedWords');
+    this.updateLocalStorage();
   }
 
   // Kelime grubu silme metodu
@@ -347,5 +349,55 @@ export class WordComponent implements OnInit {
     this.isModalOpen = false;
     document.body.style.overflow = ''; // Scroll'u geri aç
     this.excelGrupAdi = ''; // Form'u temizle
+  }
+
+  // Yanlış bilinen kelimeleri temizleme
+  clearWrongWords() {
+    this.missedWords = this.missedWords.filter(word => word.type === 'skipped');
+    this.updateLocalStorage();
+    this.notificationService.success('Yanlış bilinen kelimeler temizlendi.');
+  }
+
+  // Atlanan kelimeleri temizleme
+  clearSkippedWords() {
+    this.missedWords = this.missedWords.filter(word => word.type === 'wrong');
+    this.updateLocalStorage();
+    this.notificationService.success('Atlanan kelimeler temizlendi.');
+  }
+
+  // LocalStorage'ı güncelleme
+  private updateLocalStorage() {
+    localStorage.setItem('missedWords', JSON.stringify(this.missedWords));
+  }
+
+  // Yanlış bilinen kelimeleri Excel olarak indirme
+  downloadWrongWords() {
+    const wrongWords = this.getWrongWords();
+    this.downloadAsExcel(wrongWords, 'yanlis_bilinen_kelimeler');
+  }
+
+  // Atlanan kelimeleri Excel olarak indirme
+  downloadSkippedWords() {
+    const skippedWords = this.getSkippedWords();
+    this.downloadAsExcel(skippedWords, 'atlanan_kelimeler');
+  }
+
+  // Excel indirme işlemi
+  private downloadAsExcel(words: MissedWord[], fileName: string) {
+    const data = words.map(word => ({
+      'Kelime': word.original,
+      'Çevirisi': word.translation,
+      'Tarih': new Date(word.timestamp).toLocaleString()
+    }));
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Kelimeler');
+    
+    // Excel dosyasını indir
+    XLSX.writeFile(wb, `${fileName}_${new Date().toLocaleDateString()}.xlsx`);
+    
+    // İndirme işlemi tamamlandıktan sonra bildiri göster
+    this.notificationService.success('Kelimeler başarıyla indirildi.');
   }
 }

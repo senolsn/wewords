@@ -141,13 +141,18 @@
         <div class="modern-card mb-4">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="text-gradient mb-0">Yanlış Bilinenler</h4>
-            <button class="btn-clear" (click)="clearMissedWords()">
-              <i class="ri-delete-bin-line"></i>
-            </button>
+            <div class="d-flex gap-2">
+              <button class="btn-download" *ngIf="getWrongWords().length >= 5" (click)="downloadWrongWords()">
+                <i class="ri-download-line"></i>
+              </button>
+              <button class="btn-clear" (click)="clearWrongWords()">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
           </div>
           <div class="card-body p-0">
             <div class="missed-words">
-              <div *ngFor="let word of getWrongWords()" class="missed-word-item">
+              <div *ngFor="let word of getWrongWords().slice(0, 5)" class="missed-word-item">
                 <span class="word">{{word.original}}</span>
                 <div class="d-flex align-items-center gap-2">
                   <span class="translation" [class.visible]="visibleTranslations[word.timestamp]">
@@ -166,13 +171,18 @@
         <div class="modern-card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="text-gradient mb-0">Atlanan Kelimeler</h4>
-            <button class="btn-clear" (click)="clearMissedWords()">
-              <i class="ri-delete-bin-line"></i>
-            </button>
+            <div class="d-flex gap-2">
+              <button class="btn-download" *ngIf="getSkippedWords().length >= 5" (click)="downloadSkippedWords()">
+                <i class="ri-download-line"></i>
+              </button>
+              <button class="btn-clear" (click)="clearSkippedWords()">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
           </div>
           <div class="card-body p-0">
             <div class="missed-words">
-              <div *ngFor="let word of getSkippedWords()" class="missed-word-item">
+              <div *ngFor="let word of getSkippedWords().slice(0, 5)" class="missed-word-item">
                 <span class="word">{{word.original}}</span>
                 <div class="d-flex align-items-center gap-2">
                   <span class="translation" [class.visible]="visibleTranslations[word.timestamp]">
