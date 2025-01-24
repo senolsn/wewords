@@ -9,6 +9,7 @@ interface MissedWord {
   original: string;
   translation: string;
   timestamp: number;
+  type: 'wrong' | 'skipped';  // kelime tipi: yanlış veya atlanmış
 }
 
 @Component({
@@ -30,12 +31,16 @@ export class WordComponent implements OnInit {
   public excelGrupAdi: string = "";
   public isEnglishOrTurkish: boolean = false;
   missedWords: MissedWord[] = [];
+  visibleTranslations: { [key: number]: boolean } = {};
+  public isLightMode: boolean = false;
+  public isModalOpen: boolean = false;
 
   constructor(
     private dialogService: DialogService,
     private notificationService: NotificationService
   ) {
     this.loadMissedWords();
+    this.loadThemePreference();
   }
 
   ngOnInit(): void {
@@ -114,16 +119,15 @@ export class WordComponent implements OnInit {
 
   // Kelimeyi atlamak için çağırılacak metot
   passWord() {
-    // Önce mevcut kelimeyi bilinmeyen kelimelere ekle
     this.saveMissedWord(
       this.currentWord,
-      this.currentTranslation
+      this.currentTranslation,
+      'skipped'  // atlanan kelime
     );
 
     const previousWord = this.currentWord;
     let randomIndex = this.getRandomWordIndex();
 
-    // Eğer yeni kelime önceki kelimeyle aynıysa tekrar seçim yap
     while (this.cevirilecekKelimeler[randomIndex] === previousWord && 
            this.cevirilecekKelimeler.length > 1) {
       randomIndex = this.getRandomWordIndex();
@@ -142,7 +146,8 @@ export class WordComponent implements OnInit {
       this.isCorrect = false;
       this.saveMissedWord(
         this.currentWord,
-        this.currentTranslation
+        this.currentTranslation,
+        'wrong'  // yanlış bilinen kelime
       );
     }
     this.currentInput = "";
@@ -255,6 +260,11 @@ export class WordComponent implements OnInit {
     this.currentTranslation = templateWord;
   }
 
+  // Çeviri görünürlüğünü değiştiren metod
+  toggleTranslationVisibility(wordId: number) {
+    this.visibleTranslations[wordId] = !this.visibleTranslations[wordId];
+  }
+
   // Bilinemeyen kelimeleri localStorage'dan yükleme
   loadMissedWords() {
     const savedWords = localStorage.getItem('missedWords');
@@ -264,7 +274,7 @@ export class WordComponent implements OnInit {
   }
 
   // Bilinemeyen kelimeleri kaydetme
-  saveMissedWord(original: string, translation: string) {
+  saveMissedWord(original: string, translation: string, type: 'wrong' | 'skipped') {
     if (this.missedWords.some(word => 
         word.original === original && 
         word.translation === translation)) {
@@ -274,7 +284,8 @@ export class WordComponent implements OnInit {
     const missedWord: MissedWord = {
       original,
       translation,
-      timestamp: new Date().getTime()
+      timestamp: new Date().getTime(),
+      type
     };
     
     this.missedWords.push(missedWord);
@@ -301,5 +312,40 @@ export class WordComponent implements OnInit {
       }
       
       this.notificationService.success('Kelime grubu başarıyla silindi.');
+  }
+
+  // Yanlış bilinen kelimeleri getiren metod
+  public getWrongWords() {
+    return this.missedWords.filter(word => word.type === 'wrong');
+  }
+
+  // Atlanan kelimeleri getiren metod
+  public getSkippedWords() {
+    return this.missedWords.filter(word => word.type === 'skipped');
+  }
+
+  // Tema tercihini yükleme
+  loadThemePreference() {
+    const savedTheme = localStorage.getItem('theme');
+    this.isLightMode = savedTheme === 'light';
+  }
+
+  // Tema değiştirme
+  toggleTheme() {
+    this.isLightMode = !this.isLightMode;
+    localStorage.setItem('theme', this.isLightMode ? 'light' : 'dark');
+  }
+
+  // Modal açma
+  openWordUploadModal() {
+    this.isModalOpen = true;
+    document.body.style.overflow = 'hidden'; // Scroll'u engelle
+  }
+
+  // Modal kapatma
+  closeModal(event: Event) {
+    this.isModalOpen = false;
+    document.body.style.overflow = ''; // Scroll'u geri aç
+    this.excelGrupAdi = ''; // Form'u temizle
   }
 }

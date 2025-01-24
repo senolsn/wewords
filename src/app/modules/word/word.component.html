@@ -1,20 +1,29 @@
-<div class="bg-dark" style="min-height: 100vh; background-color: #1A1D21 !important">
-  <div class="container-fluid">
-    <div class="row" style="min-height: 96vh">
+<div class="modern-theme" [class.light-mode]="isLightMode" style="min-height: 100vh; background: linear-gradient(135deg, #1a1f25 0%, #242c35 100%);">
+  <!-- Tema değiştirme butonu -->
+  <button class="theme-toggle" (click)="toggleTheme()">
+    <i [class]="isLightMode ? 'ri-moon-line' : 'ri-sun-line'"></i>
+  </button>
+  
+  <div class="container-fluid p-4">
+    <div class="row g-4">
       <!-- Sol Panel - Kelime Grupları -->
-      <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-start mt-4" style="align-items: flex-start;">
-        <div class="card w-75 w-md-75 mx-3 mx-md-3">
-          <div class="card-header align-items-center d-flex">
-            <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Grupları</h4>
+      <div class="col-12 col-md-4">
+        <div class="modern-card">
+          <div class="card-header">
+            <h4 class="text-gradient">Kelime Grupları</h4>
           </div>
           <div class="card-body p-0">
-            <div class="list-group list-group-flush">
-              <label *ngFor="let grup of kelimeGruplari" class="list-group-item d-flex align-items-center">
-                <input type="radio" [(ngModel)]="selectedGroup" [value]="grup" 
+            <div class="word-groups">
+              <label *ngFor="let grup of kelimeGruplari" 
+                     class="word-group-item"
+                     [class.active]="selectedGroup?.key === grup.key">
+                <input type="radio" [(ngModel)]="selectedGroup" 
+                       [value]="grup" 
                        (change)="onRadioButtonChanged(grup)" 
-                       class="form-check-input me-1" name="radioButton"/> 
-                <span class="flex-grow-1">{{grup.grupAdi}}</span>
-                <button class="btn btn-sm btn-link text-danger" 
+                       class="d-none" 
+                       name="radioButton"/> 
+                <span class="group-name">{{grup.grupAdi}}</span>
+                <button class="delete-btn" 
                         (click)="$event.preventDefault(); deleteWordGroup(grup.key)"
                         *ngIf="grup.key !== 'defaultWords'">
                   <i class="ri-delete-bin-line"></i>
@@ -26,76 +35,57 @@
       </div>
       
       <!-- Orta Panel - Çeviri Alanı -->
-      <div class="col-12 col-md-4 d-flex flex-column align-items-center justify-content-center my-3 my-md-0">
+      <div class="col-12 col-md-4">
         @if(!selectedGroup){
-          <!-- Web görünümü için uyarı -->
-          <div class="card w-100 w-md-100 mx-3 mx-md-0 d-none d-md-block">
-            <div class="card-body text-center">
-              <div class="mb-4">
-                <i class="ri-arrow-left-circle-line text-warning display-5 mb-3"></i>
-                <h4 class="text-warning">Lütfen başlamak için sol taraftan bir kelime grubu seçiniz</h4>
-              </div>
-              <div>
-                <i class="ri-arrow-right-circle-line text-info display-5 mb-3"></i>
-                <h4 class="text-info">Veya sağ taraftan kendi kelime şablonunuzu yükleyebilirsiniz</h4>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mobil görünüm için uyarı -->
-          <div class="card w-100 w-md-100 mx-3 mx-md-0 d-md-none">
-            <div class="card-body text-center">
-              <div class="mb-4">
-                <i class="ri-arrow-up-circle-line text-warning display-5 mb-3"></i>
-                <h4 class="text-warning">Başlamak için yukarıdan bir kelime grubu seçiniz</h4>
-              </div>
-              <div>
-                <i class="ri-arrow-down-circle-line text-info display-5 mb-3"></i>
-                <h4 class="text-info">Veya sağ taraftan kendi kelime şablonunuzu yükleyebilirsiniz</h4>
-              </div>
+          <div class="modern-card text-center">
+            <div class="empty-state">
+              <i class="ri-translate-2-line display-1 text-gradient mb-4"></i>
+              <h4 class="text-gradient mb-3">Kelime Çevirmeye Başlayın</h4>
+              <p class="text-muted">Sol taraftan bir kelime grubu seçin veya sağ taraftan yeni kelimeler ekleyin.</p>
             </div>
           </div>
         } @else {
-          <!-- Kelime grubu seçildiğinde gösterilecek içerik -->
-          <div class="card w-100 w-md-75 mx-3 mx-md-0 mb-3">
-            <div class="card-header align-items-center d-flex">
-              <h4 class="card-title mb-0 flex-grow-1 text-center">Çevrilecek Kelime</h4>
-            </div>
-            <div class="card-body">
-              <h3 class="text-primary text-center mb-0">{{currentWord}}</h3>
+          <div class="modern-card mb-4">
+            <div class="current-word">
+              <h5 class="text-muted mb-2">Çevrilecek Kelime</h5>
+              <h2 class="text-gradient mb-0">{{currentWord}}</h2>
             </div>
           </div>
 
-          <div class="card w-100 w-md-75 mx-3 mx-md-0">
-            <div class="card-body">
-              <input type="text" id="exampleInput" [(ngModel)]="currentInput" 
-                     class="form-control form-control-lg text-white mb-3" 
+          <div class="modern-card">
+            <div class="translation-area">
+              <input type="text" [(ngModel)]="currentInput" 
+                     class="modern-input" 
                      placeholder="Çevirinizi yazın..."
                      autocomplete="off" 
                      (keyup.enter)="checkTranslation()"   
                      [ngClass]="{
-                       'border-primary': isCorrect && hasAttempted,
-                       'border-danger': !isCorrect && hasAttempted
+                       'is-correct': isCorrect && hasAttempted,
+                       'is-wrong': !isCorrect && hasAttempted
                      }"/>
               
-              <div class="d-grid gap-2">
-                <button (click)="checkTranslation()" class="btn btn-warning btn-border">Çevir</button>
-                <button (click)="passWord()" class="btn btn-danger btn-border">Atla</button>
+              <div class="action-buttons">
+                <button (click)="checkTranslation()" class="btn-check">
+                  <i class="ri-check-line me-2"></i>Kontrol Et
+                </button>
+                <button (click)="passWord()" class="btn-skip">
+                  <i class="ri-skip-forward-line me-2"></i>Atla
+                </button>
               </div>
 
-              <div class="row mt-3">
-                <div class="col-12 mb-3 d-flex justify-content-center">
-                  <div class="text-center"> Çeviri Türü: {{ isEnglishOrTurkish ? 'Türkçe -> İngilizce' : 'İngilizce -> Türkçe' }} </div>
-                </div>
-                <div class="d-flex justify-content-center align-items-center">
-                  <div class="d-flex align-items-center">
-                    <img src="assets/images/flags/us.svg" class="rounded mx-2" width="20" height="20">
-                    <div class="form-check form-switch form-switch-custom mx-2">
-                      <input [checked]="isEnglishOrTurkish" (change)="toggleTranslation($event)" class="form-check-input" type="checkbox" role="switch">
-                    </div>
-                    <img src="assets/images/flags/tr.svg" class="rounded mx-2" width="20" height="20">
+              <div class="translation-type">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                  <img src="assets/images/flags/us.svg" width="24" height="24">
+                  <div class="modern-switch" style="margin-right: 3.43rem;">
+                    <input type="checkbox" [checked]="isEnglishOrTurkish" 
+                           (change)="toggleTranslation($event)" id="langSwitch">
+                    <label for="langSwitch"></label>
                   </div>
+                  <img src="assets/images/flags/tr.svg" width="24" height="24">
                 </div>
+                <small class="text-muted mt-2">
+                  {{ isEnglishOrTurkish ? 'Türkçe -> İngilizce' : 'İngilizce -> Türkçe' }}
+                </small>
               </div>
             </div>
           </div>
@@ -103,81 +93,114 @@
       </div>
       
       <!-- Sağ Panel -->
-      <div class="col-12 col-md-4 d-flex flex-column align-items-center align-items-md-end mt-4">
-        <!-- Mobilde Bilinemeyen Kelimeler -->
-        <div class="w-75 d-md-none px-3">
-          <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="card-title mb-0">Bilinemeyen Kelimeler</h5>
-              <button (click)="clearMissedWords()" class="btn btn-sm btn-light">
-                <i class="ri-delete-bin-line"></i>
+      <div class="col-12 col-md-4">
+        <!-- Kelime Yükleme Butonu -->
+        <button class="add-words-btn" (click)="openWordUploadModal()">
+          <i class="ri-add-line"></i>
+        </button>
+
+        <!-- Kelime Yükleme Modal -->
+        <div class="modal-overlay" [class.show]="isModalOpen" (click)="closeModal($event)">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h4 class="text-gradient mb-0">Kelime Yükleme</h4>
+              <button class="modal-close" (click)="closeModal($event)">
+                <i class="ri-close-line"></i>
               </button>
             </div>
-            <div class="card-body">
-              <ul class="list-group list-group-flush">
-                <li *ngFor="let word of missedWords" class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>{{word.original}}</span>
-                  <span class="badge bg-primary text-white">{{word.translation}}</span>
-                </li>
-              </ul>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label text-muted">Grup Adı</label>
+                <input type="text" [(ngModel)]="excelGrupAdi" class="modern-input" 
+                       placeholder="Grup adını giriniz..."/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted">Excel Dosyası</label>
+                <div class="file-upload">
+                  <input type="file" (change)="onFileChange($event)" 
+                         accept=".xlsx, .xls" id="fileInput" class="d-none" />
+                  <label for="fileInput" class="upload-label">
+                    <i class="ri-upload-cloud-line me-2"></i>
+                    Dosya Seçin
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-template" (click)="downloadExcelTemplate()">
+                <i class="ri-file-excel-line me-2"></i>Şablon İndir
+              </button>
+              <button class="btn-save" (click)="saveToLocalStorage()">
+                <i class="ri-save-line me-2"></i>Kaydet
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Kelime Yükleme -->
-        <div class="w-75 w-md-75 px-3 me-md-3">
-          <div class="card">
-            <div class="card-header align-items-center d-flex">
-              <h4 class="card-title mb-0 flex-grow-1 text-center">Kelime Yükleme</h4>
-            </div>
-            <div class="card-body">
-              <div class="form-group mb-2">
-                <label class="form-label text-white">Grup Adı</label>
-                <input type="text" [(ngModel)]="excelGrupAdi" class="form-control" />
-              </div>
-              <div class="form-group">
-                <label class="form-label text-white">Excel Dosyası Yükle</label>
-                <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" class="form-control" />
-              </div>
-              <div class="d-grid gap-2 mt-3">
-                <button (click)="saveToLocalStorage()" class="btn btn-primary">Kelime Grubunu Kaydet</button>
-                <button type="button" (click)="downloadExcelTemplate()" class="btn btn-success btn-label waves-effect waves-light">
-                  <i class="ri-file-excel-line label-icon align-middle fs-16 me-2"></i> Örnek Şablon İndir
-                </button>
-              </div>
-            </div>
+        <!-- Yanlış Bilinenler -->
+        <div class="modern-card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="text-gradient mb-0">Yanlış Bilinenler</h4>
+            <button class="btn-clear" (click)="clearMissedWords()">
+              <i class="ri-delete-bin-line"></i>
+            </button>
           </div>
-
-          <!-- Masaüstünde Bilinemeyen Kelimeler -->
-          <div class="d-none d-md-block">
-            <div class="card mt-3">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Bilinemeyen Kelimeler</h5>
-                <button (click)="clearMissedWords()" class="btn btn-sm btn-light">
-                  <i class="ri-delete-bin-line"></i>
-                </button>
-              </div>
-              <div class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li *ngFor="let word of missedWords" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{{word.original}}</span>
-                    <span class="badge bg-primary text-white">{{word.translation}}</span>
-                  </li>
-                </ul>
+          <div class="card-body p-0">
+            <div class="missed-words">
+              <div *ngFor="let word of getWrongWords()" class="missed-word-item">
+                <span class="word">{{word.original}}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="translation" [class.visible]="visibleTranslations[word.timestamp]">
+                    {{word.translation}}
+                  </span>
+                  <button class="btn-eye" (click)="toggleTranslationVisibility(word.timestamp)">
+                    <i class="ri-eye-line" [class.active]="visibleTranslations[word.timestamp]"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Footer -->
-    <div class="row">
-      <div class="col-12 text-center mb-3">
-        <h6 class="mb-0">© Designed and developed by codeweh</h6>
+
+        <!-- Atlanan Kelimeler -->
+        <div class="modern-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="text-gradient mb-0">Atlanan Kelimeler</h4>
+            <button class="btn-clear" (click)="clearMissedWords()">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="missed-words">
+              <div *ngFor="let word of getSkippedWords()" class="missed-word-item">
+                <span class="word">{{word.original}}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="translation" [class.visible]="visibleTranslations[word.timestamp]">
+                    {{word.translation}}
+                  </span>
+                  <button class="btn-eye" (click)="toggleTranslationVisibility(word.timestamp)">
+                    <i class="ri-eye-line" [class.active]="visibleTranslations[word.timestamp]"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="modern-footer">
+    <div class="footer-content">
+      <span>© 2024</span>
+      <span class="separator">•</span>
+      <span>Designed & Developed by</span>
+      <a href="https://instagram.com/codeweh" target="_blank" class="footer-brand">
+        code<span class="text-gradient">weh</span>
+      </a>
+    </div>
+  </footer>
 </div>
 
 
