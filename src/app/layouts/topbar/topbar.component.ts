@@ -6,9 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { LanguageService } from '../../core/services/language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AuthService } from 'src/app/core/services/auth.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { User } from 'src/app/core/models/user.model';
 import themes from 'devextreme/ui/themes';
 import { loadMessages, locale } from 'devextreme/localization';
 import trMessages from 'devextreme/localization/messages/tr.json';
@@ -34,16 +32,12 @@ export class TopbarComponent implements OnInit {
   countryName: any;
 
   constructor(@Inject(DOCUMENT) private document: any, private eventService: EventService, public languageService: LanguageService, private modalService: NgbModal,
-    public _cookiesService: CookieService, public translate: TranslateService, private authService: AuthService,
-    private router: Router, private tokenService: TokenService) {
+    public _cookiesService: CookieService, public translate: TranslateService, private tokenService: TokenService) {
   }
 
   ngOnInit(): void {
     this.element = document.documentElement;
 
-    this.authService.getUser().subscribe(data =>
-      this.userName = data.userName
-    )
     this.setFlagLangValue();
     this.langValue = this.languageService.getLanguage();
     const val = this.listLang.filter(x => x.lang === this.langValue);
@@ -158,10 +152,6 @@ export class TopbarComponent implements OnInit {
         break;
     }
     this.setFlagLangValue();
-  }
-
-  logout() {
-    this.authService.logout();
   }
 
   windowScroll() {

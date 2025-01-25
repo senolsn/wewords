@@ -5,7 +5,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { environment } from 'src/environments/environment';
-import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -20,7 +19,7 @@ export class SidebarComponent implements OnInit {
   @ViewChild('sideMenu') sideMenu!: ElementRef;
   @Output() mobileMenuButtonClicked = new EventEmitter();
 
-  constructor(private router: Router, public translate: TranslateService, private authService: AuthService) {
+  constructor(private router: Router, public translate: TranslateService) {
     translate.setDefaultLang('en');
   }
 
