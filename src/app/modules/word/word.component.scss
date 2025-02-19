@@ -584,3 +584,85 @@ html, body {
     gap: 0.5rem;
   }
 }
+
+// Modern buton stili
+.modern-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  
+  &.primary {
+    background: var(--primary);
+    color: var(--text);
+    
+    .light-mode & {
+      background: #3b82f6;
+      color: white;
+      
+      &:hover {
+        background: #2563eb;
+      }
+    }
+    
+    &:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  &.secondary {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border-color);
+    
+    .light-mode & {
+      background: white;
+      border-color: #e2e8f0;
+      
+      &:hover {
+        background: #f8fafc;
+      }
+    }
+    
+    &:hover {
+      background: var(--bg-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Modal footer düzenlemesi
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  
+  .modern-button {
+    flex: 1;
+  }
+}
+
+// Mobil için düzenleme
+@media (max-width: 768px) {
+  .modal-footer {
+    flex-direction: column;
+    
+    .modern-button {
+      width: 100%;
+    }
+  }
+}
